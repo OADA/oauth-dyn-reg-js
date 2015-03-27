@@ -1,0 +1,47 @@
+{
+  "name": "oauth-dyn-reg",
+  "version": "0.0.0",
+  "description": "Implementation of draft OAuth 2.0 Dynamic Client Registration Protocol",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -w",
+    "cover": "istanbul cover _mocha",
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js .",
+    "style": "jscs .",
+    "clean": "rm -rf ./coverage"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OADA/oauth-dyn-reg-js.git"
+  },
+  "keywords": [
+    "oada",
+    "oauth2",
+    "draft-ietf-oauth-dyn-reg"
+  ],
+  "author": {
+    "name": "Alex Layton",
+    "email": "alex@layton.in",
+    "url": "http://alex.layton.in"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/OADA/oauth-dyn-reg-js/issues"
+  },
+  "homepage": "https://github.com/OADA/oauth-dyn-reg-js",
+  "devDependencies": {
+    "chai": "^2.1.2",
+    "istanbul": "^0.3.11",
+    "jscs": "^1.12.0",
+    "jshint": "^2.6.3",
+    "jshint-stylish": "^1.0.1",
+    "mocha": "^2.2.1",
+    "nock": "^1.2.1"
+  },
+  "dependencies": {
+    "superagent": "^1.1.0"
+  }
+}

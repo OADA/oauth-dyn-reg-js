@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+- '0.10'
+- '0.11'
+- '0.12'
+- node
+- iojs
+sudo: false
+deploy:
+  provider: npm
+  email: alex@layton.in
+  api_key:
+    secure: c9qdKsStX8BB6cZuabeARmldyviFo6oIMvm8p1m/gkb6esL/kP7K+nz06zTmwCkclfbhe0I4O/WX892qzI06Qk2/+fjoEpXwlD57ItHpZGiN0q8NjOrh5h3i+7WL3s4URAUY+3RSAsgrx6DAWuENY83ZAq3W7ouzo/IvrVHg/Ko=
+  on:
+    tags: true
+    all_branches: true
+    repo: OADA/oauth-dyn-reg-js
+before_install:
+ - npm install -g coveralls
+script:
+- npm run lint
+- npm run style
+- npm run cover
+after_success:
+- cat ./coverage/lcov.info | coveralls --verbose
