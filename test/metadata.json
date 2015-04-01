@@ -1,0 +1,8 @@
+{
+    "client_id": "DEADBEEF",
+    "jwks_uri": "https://client.example.org/public_keys.jwks",
+    "redirect_uris": [
+        "https://client.example.org/redirect1",
+        "https://client.example.org/redirect2"
+    ]
+}

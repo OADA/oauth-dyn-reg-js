@@ -15,80 +15,49 @@
 
 'use strict';
 
+var fs = require('fs');
 var expect = require('chai').expect;
-var nock = require('nock');
 var register = require('../');
 
-var serverUri = 'https://identity.oada-dev.com';
-var server;
-
 describe('oauth-dyn-reg', function() {
-    beforeEach(function() {
-        server = nock(serverUri);
-    });
+    var metadata;
+    var serverUri;
+    var statement;
 
-    afterEach(function() {
-        nock.cleanAll();
+    before(function(done) {
+        metadata = require('./metadata.json');
+        serverUri = 'http://localhost:3000';
+        fs.readFile('./test/software_statement.jwt', function(err, data) {
+            if (err) { return done(err); }
+            statement = data.toString();
+            done();
+        });
     });
 
     it('should POST client metadata', function(done) {
-        var endpoint = '/register';
-        var metadata = {
-            a: 1,
-            b: 2,
-            c: 'a'
-        };
-
-        server.post(endpoint, metadata).once().reply(200);
-
-        register(metadata, serverUri + endpoint, function(err, resp) {
+        register(metadata, serverUri + '/echo', function(err, resp) {
             expect(err).to.be.not.ok;
-            expect(resp).to.be.ok;
+            expect(resp).to.deep.equal(metadata);
             done();
         });
     });
 
     it('should POST with Content-Type application/json', function(done) {
-        var endpoint = '/register';
-
-        server.matchHeader('Content-Type', 'application/json')
-            .post(endpoint)
-            .once()
-            .reply(200);
-
-        register({}, serverUri + endpoint, function(err, resp) {
+        register({}, serverUri + '/type/application/json', function(err) {
             expect(err).to.be.not.ok;
-            expect(resp).to.be.ok;
             done();
         });
     });
 
     it('should accept application/json', function(done) {
-        var endpoint = '/register';
-
-        server.matchHeader('Accept', 'application/json')
-            .post(endpoint)
-            .once()
-            .reply(200);
-
-        register({}, serverUri + endpoint, function(err, resp) {
+        register({}, serverUri + '/accept/application/json', function(err) {
             expect(err).to.be.not.ok;
-            expect(resp).to.be.ok;
             done();
         });
     });
 
     it('should pass responded metadata to callback', function(done) {
-        var endpoint = '/register';
-        var metadata = {
-            a: 1,
-            b: 2,
-            c: 'a'
-        };
-
-        server.post(endpoint).once().reply(200, metadata);
-
-        register({}, serverUri + endpoint, function(err, resp) {
+        register({}, serverUri + '/metadata', function(err, resp) {
             expect(err).to.be.not.ok;
             expect(resp).to.deep.equal(metadata);
             done();
@@ -96,49 +65,35 @@ describe('oauth-dyn-reg', function() {
     });
 
     it('should work with just a software statement', function(done) {
-        var endpoint = '/register';
-        var softwareStatement = 'FOOBAR32';
-
-        server.post(endpoint, {'software_statement': softwareStatement})
-            .once()
-            .reply(200);
-
-        register(softwareStatement, serverUri + endpoint, function(err, resp) {
+        register(statement, serverUri + '/echo', function(err, resp) {
             expect(err).to.be.not.ok;
-            expect(resp).to.be.ok;
+            expect(resp).to.deep.equal({'software_statement': statement});
             done();
         });
     });
 
     describe('optional OAuth 2.0', function() {
-        var token = 'DEAD BEEF';
+        var token;
+
+        before(function(done) {
+            fs.readFile('./test/token', function(err, data) {
+                if (err) { return done(err); }
+                token = data.toString();
+                done();
+            });
+        });
 
         it('should use OAuth 2.0 when given a token', function(done) {
-            var endpoint = '/register_oauth';
-
-            server.matchHeader('Authorization', token)
-                .post(endpoint)
-                .once()
-                .reply(200);
-
-            register({}, serverUri + endpoint, function(err, resp) {
+            register({}, serverUri + '/oauth', function(err) {
                 expect(err).to.be.not.ok;
-                expect(resp).to.be.ok;
                 done();
             }, token);
         });
 
         it('should not use OAuth 2.0 when not given a token', function(done) {
-            var endpoint = '/register';
-
-            server.matchHeader('Authorization', undefined)
-                .post(endpoint)
-                .once()
-                .reply(200);
-
-            register({}, serverUri + endpoint, function(err, resp) {
-                expect(err).to.be.not.ok;
-                expect(resp).to.be.ok;
+            register({}, serverUri + '/oauth', function(err) {
+                expect(err).to.be.ok;
+                expect(err.status).to.equal(401);
                 done();
             });
         });
@@ -146,69 +101,39 @@ describe('oauth-dyn-reg', function() {
 
     describe('error handling', function() {
         it('should pass errors to callback', function(done) {
-            register({}, server, function(err, resp) {
+            register({}, serverUri, function(err) {
                 expect(err).to.be.ok;
-                expect(resp).to.be.not.ok;
                 done();
             });
         });
 
         describe('for client registration errors', function() {
+            var regErr;
+
+            before(function() {
+                regErr = require('./registration_err.json');
+            });
+
             it('should work with a description', function(done) {
-                var endpoint = '/register';
-                var error = {
-                    'error': 'invalid_client_metadata',
-                    'error_description':
-                        'The grant type \'authorization_code\' must be' +
-                        ' registered along with the response type \'code\'' +
-                        ' but found only \'implicit\' instead.'
-                };
-
-                server.post(endpoint).once().reply(400, error);
-
-                register({}, serverUri + endpoint, function(err, resp) {
+                register({}, serverUri + '/error', function(err, resp) {
                     expect(err).to.be
                         .an.instanceOf(register.ClientRegistrationError);
-                    expect(err.name).to.equal(error['error']);
-                    expect(err.message).to.equal(error['error_description']);
+                    expect(err.name).to.equal(regErr['error']);
+                    expect(err.message).to.equal(regErr['error_description']);
                     expect(resp).to.be.not.ok;
                     done();
                 });
             });
 
             it('should work without a description', function(done) {
-                var endpoint = '/register';
-                var error = {
-                    'error': 'invalid_client_metadata'
-                };
-
-                server.post(endpoint).once().reply(400, error);
-
-                register({}, serverUri + endpoint, function(err, resp) {
+                register({}, serverUri + '/error_only', function(err, resp) {
                     expect(err).to.be
                         .an.instanceOf(register.ClientRegistrationError);
-                    expect(err.name).to.equal(error['error']);
-                    expect(err.message).to.equal(error['error_description']);
+                    expect(err.name).to.equal(regErr['error']);
+                    expect(err.message).to.be.not.ok;
                     expect(resp).to.be.not.ok;
                     done();
                 });
-            });
-        });
-
-        it('should return JSON response body with HTTP errors', function(done) {
-            var endpoint = '/register';
-            var json = {
-                'foo': 'bar',
-                'a': 'b'
-            };
-
-            server.post(endpoint).once().reply(400, json);
-
-            register({}, serverUri + endpoint, function(err, resp) {
-                expect(err).to.not.be
-                    .an.instanceOf(register.ClientRegistrationError);
-                expect(resp).to.deep.equal(json);
-                done();
             });
         });
     });

@@ -33,13 +33,12 @@ module.exports = function register(metadata, endpoint, callback, token) {
         .accept('application/json')
         .send(params);
 
-    if (token) { req.set('Authorization', token); }
+    if (token) { req.set('Authorization', token.replace(/\n/, '')); }
 
-    /* istanbul ignore else */
-    if (typeof req.buffer === 'function') { req.buffer(); /* browser */ }
+    if (typeof req.buffer === 'function') { req.buffer(); }
 
     req.end(function handleResponse(err, resp) {
-        err = err || resp.error;
+        err = resp.error || err;
         resp = resp || err.respsonse;
 
         // Handle registration erros as defined in RFC
@@ -48,7 +47,7 @@ module.exports = function register(metadata, endpoint, callback, token) {
             resp = null;
         }
 
-        return callback(err, resp && resp.body);
+        return callback(err, resp && (resp.body || resp.text));
     });
 };
 

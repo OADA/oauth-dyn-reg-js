@@ -1,0 +1,4 @@
+{
+"error": "invalid_client_metadata",
+"error_description": "The grant type \"authorization_code\" must be registered along with the response type \"code\" but found only \"implicit\" instead."
+}
