@@ -2,6 +2,7 @@ instrumentation:
     root: .
     default-excludes: true
     excludes:
+        - karma.conf.js
         - gulpfile.*
         - Gulpfile.*
         - Gruntfile.*
