@@ -69,8 +69,7 @@ app.post('/error', function(req, res) {
 });
 
 app.post('/error_only', function(req, res) {
-    var err = regErr;
-    err['error_description'] = undefined;
+    var err = {error: regErr.error};
     res.status(400).send(err);
 });
 
