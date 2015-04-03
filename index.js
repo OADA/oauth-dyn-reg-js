@@ -33,9 +33,13 @@ module.exports = function register(metadata, endpoint, callback, token) {
         .accept('application/json')
         .send(params);
 
-    if (token) { req.set('Authorization', token.replace(/\n/, '')); }
+    if (token) {
+        req.set('Authorization', token.replace(/\n/, ''));
+    }
 
-    if (typeof req.buffer === 'function') { req.buffer(); }
+    if (typeof req.buffer === 'function') {
+        req.buffer();
+    }
 
     req.end(function handleResponse(err, resp) {
         err = resp.error || err;
