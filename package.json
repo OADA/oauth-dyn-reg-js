@@ -10,6 +10,11 @@
     "style": "jscs .",
     "clean": "rm -rf ./coverage"
   },
+  "mocha": {
+    "reporter": "spec",
+    "ui": "bdd",
+    "timeout": 200
+  },
   "directories": {
     "test": "test"
   },
@@ -33,15 +38,15 @@
   },
   "homepage": "https://github.com/OADA/oauth-dyn-reg-js",
   "devDependencies": {
-    "chai": "^2.1.2",
-    "istanbul": "^0.3.11",
-    "jscs": "^1.12.0",
+    "chai": "^4.2.0",
+    "istanbul": "^0.4.5",
+    "jscs": "^3.0.7",
     "jshint": "^2.6.3",
-    "jshint-stylish": "^1.0.1",
-    "mocha": "^2.2.1",
-    "nock": "^1.2.1"
+    "jshint-stylish": "^2.2.1",
+    "mocha": "^7.0.1",
+    "nock": "^11.7.2"
   },
   "dependencies": {
-    "superagent": "^1.1.0"
+    "superagent": "^5.2.1"
   }
 }

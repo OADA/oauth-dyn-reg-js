@@ -131,7 +131,7 @@ describe('oauth-dyn-reg', function() {
         it('should not use OAuth 2.0 when not given a token', function(done) {
             var endpoint = '/register';
 
-            server.matchHeader('Authorization', undefined)
+            server.matchHeader('Authorization', function (val) { return val === undefined })
                 .post(endpoint)
                 .once()
                 .reply(200);
