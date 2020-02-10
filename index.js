@@ -13,43 +13,48 @@
  * limitations under the License.
  */
 
-'use strict';
+'use strict'
 
-var request = require('superagent');
+var request = require('superagent')
 
-function ClientRegistrationError(resp) {
-    this.message = resp['error_description'];
-    this.name = resp['error'];
+function ClientRegistrationError (resp) {
+  this.message = resp.error_description
+  this.name = resp.error
 }
-ClientRegistrationError.prototype = Object.create(Error.prototype);
-ClientRegistrationError.constructor = ClientRegistrationError;
+ClientRegistrationError.prototype = Object.create(Error.prototype)
+ClientRegistrationError.constructor = ClientRegistrationError
 
-module.exports = function register(metadata, endpoint, callback, token) {
-    var params = typeof metadata === 'object' ?
-            metadata : {'software_statement': metadata};
+module.exports = function register (metadata, endpoint, callback, token) {
+  var params =
+    typeof metadata === 'object' ? metadata : { software_statement: metadata }
 
-    var req = request.post(endpoint)
-        .type('application/json')
-        .accept('application/json')
-        .send(params);
+  var req = request
+    .post(endpoint)
+    .type('application/json')
+    .accept('application/json')
+    .send(params)
 
-    if (token) { req.set('Authorization', token); }
+  if (token) {
+    req.set('Authorization', token)
+  }
 
-    /* istanbul ignore else */
-    if (typeof req.buffer === 'function') { req.buffer(); /* browser */ }
+  /* istanbul ignore else */
+  if (typeof req.buffer === 'function') {
+    req.buffer() /* browser */
+  }
 
-    req.end(function handleResponse(err, resp) {
-        err = err || resp.error;
-        resp = resp || err.respsonse;
+  req.end(function handleResponse (err, resp) {
+    err = err || resp.error
+    resp = resp || err.respsonse
 
-        // Handle registration erros as defined in RFC
-        if (err && err.status === 400 && resp.body.error) {
-            err = new ClientRegistrationError(resp.body);
-            resp = null;
-        }
+    // Handle registration erros as defined in RFC
+    if (err && err.status === 400 && resp.body.error) {
+      err = new ClientRegistrationError(resp.body)
+      resp = null
+    }
 
-        return callback(err, resp && resp.body);
-    });
-};
+    return callback(err, resp && resp.body)
+  })
+}
 
-module.exports.ClientRegistrationError = ClientRegistrationError;
+module.exports.ClientRegistrationError = ClientRegistrationError

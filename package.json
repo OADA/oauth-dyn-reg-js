@@ -6,8 +6,6 @@
   "scripts": {
     "test": "mocha -w",
     "cover": "istanbul cover _mocha",
-    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js .",
-    "style": "jscs .",
     "clean": "rm -rf ./coverage"
   },
   "mocha": {
@@ -40,11 +38,10 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "istanbul": "^0.4.5",
-    "jscs": "^3.0.7",
-    "jshint": "^2.6.3",
-    "jshint-stylish": "^2.2.1",
     "mocha": "^7.0.1",
-    "nock": "^11.7.2"
+    "nock": "^11.7.2",
+    "prettier-standard": "^16.1.0",
+    "standard": "^14.3.1"
   },
   "dependencies": {
     "superagent": "^5.2.1"
