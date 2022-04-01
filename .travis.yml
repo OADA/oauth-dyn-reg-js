@@ -1,10 +1,10 @@
 language: node_js
 node_js:
-- '0.10'
-- '0.11'
-- '0.12'
-- node
-- iojs
+  - '0.10'
+  - '0.11'
+  - '0.12'
+  - node
+  - iojs
 sudo: false
 deploy:
   provider: npm
@@ -16,10 +16,10 @@ deploy:
     all_branches: true
     repo: OADA/oauth-dyn-reg-js
 before_install:
- - npm install -g coveralls
+  - npm install -g coveralls
 script:
-- npm run lint
-- npm run style
-- npm run cover
+  - npm run lint
+  - npm run style
+  - npm run cover
 after_success:
-- cat ./coverage/lcov.info | coveralls --verbose
+  - cat ./coverage/lcov.info | coveralls --verbose
