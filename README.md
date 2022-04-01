@@ -29,12 +29,11 @@ const resp = await register(metadata, registrationEndpoint);
 // !!!: resp may differ from metadata, the server MAY change values
 ```
 
-An [OAuth 2.0 token][token] maybe optionally be given
-after the callback parameter.
+An [OAuth 2.0 token][token] maybe optionally be given as a third parameter.
 
 ## References
 
-1. [Draft OAuth 2.0 Dynamic Client Registration Protocol][rfc]
+1. [OAuth 2.0 Dynamic Client Registration Protocol][rfc]
 1. [OAuth 2.0 Authorization Framework][token]
 
 [rfc]: https://datatracker.ietf.org/doc/html/rfc7591 'OAuth 2.0 Dynamic Client Registration Protocol'
