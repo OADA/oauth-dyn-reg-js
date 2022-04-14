@@ -18,6 +18,7 @@
 import request, { HTTPError, ResponseError } from 'superagent';
 
 import type Metadata from '@oada/types/oauth-dyn-reg/metadata.js';
+import type RegistrationData from '@oada/types/oauth-dyn-reg/response.js';
 
 export class ClientRegistrationError extends Error {
   readonly response;
@@ -75,7 +76,7 @@ export default async function register(
 
   try {
     const resp = await registration;
-    return resp?.body as Metadata;
+    return resp?.body as RegistrationData;
   } catch (error: unknown) {
     // Handle registration errors as defined in RFC
     if (isResponseError(error)) {
