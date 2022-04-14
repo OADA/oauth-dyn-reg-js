@@ -17,7 +17,7 @@
 
 import request, { HTTPError, ResponseError } from 'superagent';
 
-import type Metadata from '@oada/types/oada/oauth-dyn-reg/register-response/v1.js';
+import type Metadata from '@oada/types/oauth-dyn-reg/metadata.js';
 
 export class ClientRegistrationError extends Error {
   readonly response;
@@ -50,7 +50,7 @@ export class ClientRegistrationError extends Error {
  * for further details.
  */
 export default async function register(
-  metadata: Partial<Metadata> | string,
+  metadata: Metadata | string,
   endpoint: string,
   token?: string
 ) {
