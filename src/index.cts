@@ -15,18 +15,27 @@
  * limitations under the License.
  */
 
-import request, { HTTPError, ResponseError } from 'superagent';
+import type {} from 'cross-fetch';
 
+// @ts-expect-error only needed for types
 import type Metadata from '@oada/types/oauth-dyn-reg/metadata.js';
+// @ts-expect-error only needed for types
 import type RegistrationData from '@oada/types/oauth-dyn-reg/response.js';
 
 export class ClientRegistrationError extends Error {
   readonly response;
-  constructor(error: ResponseError) {
-    super(error.response?.body.error_description);
-    this.name = `${error.response?.body?.error ?? error.name}`;
-    this.response = error.response;
+  constructor(response: Response, error: string, description?: string) {
+    super(description);
+    this.name = error;
+    this.response = response;
   }
+}
+
+export interface Options {
+  metadata: Metadata | string;
+  endpoint: string | URL;
+  token?: string;
+  fetch?: typeof fetch;
 }
 
 /**
@@ -50,48 +59,46 @@ export class ClientRegistrationError extends Error {
  * {@link https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.1 Client Information Response }
  * for further details.
  */
-export default async function register(
-  metadata: Metadata | string,
-  endpoint: string,
-  token?: string
-) {
+export async function register({
+  metadata,
+  endpoint,
+  token,
+  fetch = globalThis.fetch,
+}: Options): Promise<RegistrationData> {
   const parameters =
     typeof metadata === 'object'
       ? metadata
       : { software_statement: `${metadata}` };
-
-  const registration = request
-    .post(endpoint)
-    .type('application/json')
-    .accept('application/json')
-    .send(parameters);
+  const body = JSON.stringify(parameters);
+  const headers = new Headers({
+    'Content-Type': 'application/json',
+    'Content-Length': `${body.length}`,
+    'Accept': 'application/json',
+  });
 
   if (token) {
-    void registration.set('Authorization', token);
+    headers.append('Authorization', `Bearer ${token}`);
   }
 
-  if (typeof registration.buffer === 'function') {
-    void registration.buffer(); /* Browser */
-  }
-
-  try {
-    const resp = await registration;
-    return resp?.body as RegistrationData;
-  } catch (error: unknown) {
-    // Handle registration errors as defined in RFC
-    if (isResponseError(error)) {
-      if (error.status === 400) {
-        throw new ClientRegistrationError(error);
-      }
-
-      throw error as HTTPError;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body,
+  });
+  if (!response.ok) {
+    /**
+     * @see {@link https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.2}
+     */
+    if (response.status === 400) {
+      const { error, error_description } = await response.json();
+      throw new ClientRegistrationError(response, error, error_description);
     }
 
-    // Otherwise just pass the error up?
-    throw error;
+    throw new ClientRegistrationError(
+      response,
+      `${response.status}: ${response.statusText}`
+    );
   }
-}
 
-function isResponseError(error: unknown): error is ResponseError {
-  return error instanceof Error && 'status' in error && 'response' in error;
+  return response.json();
 }

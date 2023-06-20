@@ -1,6 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
     "allowJs": true,
     "rootDir": ".",
     "outDir": "../.test"

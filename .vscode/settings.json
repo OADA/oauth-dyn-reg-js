@@ -1,5 +1,8 @@
 {
-  "cSpell.words": ["lcov", "sonarjs"],
+  "cSpell.words": [
+    "lcov",
+    "sonarjs"
+  ],
   "files.exclude": {
     "*.log": true,
     "tags.*": true,
@@ -28,7 +31,9 @@
     ".dccache": true,
     ".yarn": true,
     ".pnp.*": true,
-    "*.tsbuildinfo": true
+    "*.tsbuildinfo": true,
+    "**/.yarn": true,
+    "**/.pnp.*": true
   },
   "eslint.nodePath": ".yarn/sdks",
   "prettier.prettierPath": ".yarn/sdks/prettier/index.js",
