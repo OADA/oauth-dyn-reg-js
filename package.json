@@ -1,6 +1,6 @@
 {
   "name": "oauth-dyn-reg",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Implementation of draft OAuth 2.0 Dynamic Client Registration Protocol",
   "main": "dist/index.js",
   "type": "module",
