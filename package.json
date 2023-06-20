@@ -1,12 +1,11 @@
 {
   "name": "oauth-dyn-reg",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Implementation of draft OAuth 2.0 Dynamic Client Registration Protocol",
   "main": "dist/index.js",
   "type": "module",
   "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
+    "default": "./dist/index.cjs"
   },
   "engines": {
     "node": ">=16.0.0"
